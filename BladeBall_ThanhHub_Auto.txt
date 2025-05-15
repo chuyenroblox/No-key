@@ -1,0 +1,69 @@
+-- Blade Ball Script Auto Parry + Spam Tối Thượng
+-- Không UI, chỉ thông báo khi bật | Không delay | Tầm xa | Siêu Spam
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
+
+-- Thông báo khi bật script
+StarterGui:SetCore("SendNotification", {
+    Title = "Thanh Hub - Blade Ball",
+    Text = "Script đã được bật! Bạn có thể chơi mà không sợ thua.",
+    Duration = 6
+})
+
+-- Cấu hình
+local spamDistance = 100 -- tầm xa cực đại
+local spamDelay = 0.00000001 -- gần như spam liên tục
+local lastSpam = 0
+
+-- Remote Events
+local parryRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("ParryAttempt")
+local attackRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("Throw") or ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("Kick")
+
+-- Tự động Parry không delay
+local function autoParry()
+    if parryRemote then
+        pcall(function()
+            parryRemote:FireServer("Parry")
+        end)
+    end
+end
+
+-- Tìm kẻ địch gần nhất
+local function getNearestEnemy()
+    local closest, shortestDist = nil, math.huge
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local dist = (LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+            if dist < shortestDist then
+                shortestDist = dist
+                closest = player
+            end
+        end
+    end
+    return closest, shortestDist
+end
+
+-- Spam đánh liên tục
+local function spamAttack()
+    if attackRemote then
+        pcall(function()
+            attackRemote:FireServer()
+        end)
+    end
+end
+
+-- Luôn chạy khi bật script
+RunService.Heartbeat:Connect(function()
+    autoParry()
+    local enemy, dist = getNearestEnemy()
+    if enemy and dist <= spamDistance then
+        if tick() - lastSpam >= spamDelay then
+            spamAttack()
+            lastSpam = tick()
+        end
+    end
+end)
