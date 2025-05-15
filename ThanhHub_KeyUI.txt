@@ -1,7 +1,84 @@
 
--- ThanhHub - Blox Fruits GUI Script (Giao diện chia tab rõ ràng, hỗ trợ tiếng Việt và tiếng Anh)
+-- ThanhHub - Blox Fruits GUI Script (Giao diện chia tab, đa chức năng, đa ngôn ngữ)
 
+-- Module dịch
 local TranslationModule = {}
 
-TranslationModule.languages = { "vi", "en" } TranslationModule.currentLanguage = "vi" TranslationModule.dictionary = { vi = { welcome = "Chào mừng đến với Thanh Hub!", toggleLanguage = "Chuyển sang tiếng Anh", tab1 = "Tab 1 - Farm Level", tab2 = "Tab 2 - Nhiệm vụ đặc biệt", tab3 = "Tab 3 - Auto Stat", tab4 = "Tab 4 - Nhặt trái", tab5 = "Tab 5 - Cài đặt", btnEnable = "Bật",
+TranslationModule.languages = { "vi", "en" }
+TranslationModule.currentLanguage = "vi"
+TranslationModule.dictionary = {
+    vi = {
+        welcome = "Chào mừng đến với Thanh Hub!",
+        toggleLanguage = "Chuyển sang tiếng Anh",
+        tab1 = "Tab 1 - Farm Level",
+        tab2 = "Tab 2 - Nhiệm vụ đặc biệt",
+        tab3 = "Tab 3 - Auto Stat",
+        tab4 = "Tab 4 - Nhặt trái",
+        tab5 = "Tab 5 - Cài đặt",
+        btnEnable = "Bật",
+        btnDisable = "Tắt",
+        autoFarmOn = "Auto farm đang bật",
+        autoFarmOff = "Auto farm đang tắt",
+        autoQuestOn = "Auto nhiệm vụ đặc biệt bật",
+        autoQuestOff = "Auto nhiệm vụ đặc biệt tắt",
+        autoStatOn = "Auto tăng chỉ số bật",
+        autoStatOff = "Auto tăng chỉ số tắt",
+        autoPickOn = "Auto nhặt trái bật",
+        autoPickOff = "Auto nhặt trái tắt",
+        noLagOn = "Chế độ no lag bật",
+        noLagOff = "Chế độ no lag tắt",
+    },
+    en = {
+        welcome = "Welcome to Thanh Hub!",
+        toggleLanguage = "Switch to Vietnamese",
+        tab1 = "Tab 1 - Farm Level",
+        tab2 = "Tab 2 - Special Quests",
+        tab3 = "Tab 3 - Auto Stats",
+        tab4 = "Tab 4 - Auto Pick Fruits",
+        tab5 = "Tab 5 - Settings",
+        btnEnable = "Enable",
+        btnDisable = "Disable",
+        autoFarmOn = "Auto farm enabled",
+        autoFarmOff = "Auto farm disabled",
+        autoQuestOn = "Auto special quest enabled",
+        autoQuestOff = "Auto special quest disabled",
+        autoStatOn = "Auto stats enabled",
+        autoStatOff = "Auto stats disabled",
+        autoPickOn = "Auto pick fruits enabled",
+        autoPickOff = "Auto pick fruits disabled",
+        noLagOn = "No lag mode enabled",
+        noLagOff = "No lag mode disabled",
+    }
+}
 
+function TranslationModule:GetText(key)
+    local lang = self.currentLanguage
+    if self.dictionary[lang] and self.dictionary[lang][key] then
+        return self.dictionary[lang][key]
+    else
+        return key
+    end
+end
+
+function TranslationModule:SetLanguage(lang)
+    for _, v in ipairs(self.languages) do
+        if v == lang then
+            self.currentLanguage = lang
+            return
+        end
+    end
+end
+
+-- UI setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ThanhHubUI"
+ScreenGui.Parent = game.CoreGui
+
+local language = TranslationModule.currentLanguage
+
+local function translate(key)
+    return TranslationModule:GetText(key)
+end
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 400, 0,
