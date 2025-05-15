@@ -1,64 +1,67 @@
--- Blade Ball Auto Parry + Spam (Không UI, tự động bật)
--- Made by ChatGPT - Phiên bản tối ưu tốc độ & đơn giản
+-- Auto Parry + Spam Fix (Không UI)
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 
 local spamDistance = 15
 local spamDelay = 0.01
 local lastSpam = 0
 
--- Thông báo khi script bật
+-- Notification
 StarterGui:SetCore("SendNotification", {
     Title = "Blade Ball Script",
-    Text = "Script đã được bật! Bạn có thể chơi mà không sợ thua!",
+    Text = "Script đã bật! Tự động parry và spam!",
     Duration = 5
 })
 
--- Hàm tự động parry (nếu có RemoteEvent riêng, cần thay thế)
+-- Remote chuẩn
+local parryRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("ParryAttempt")
+local attackRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("Throw") or ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("Kick")
+
+-- Auto Parry
 local function autoParry()
-    -- Gửi sự kiện hoặc mô phỏng parry tại đây
-    -- Giả lập parry bằng cách gọi hàm từ remote (tuỳ vào game)
-    local args = {
-        [1] = "Parry"
-    }
-    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ParryAttempt"):FireServer(unpack(args))
+    if parryRemote then
+        pcall(function()
+            parryRemote:FireServer("Parry")
+        end)
+    end
 end
 
--- Spam đánh nếu kẻ địch ở gần
+-- Auto Spam Attack
+local function spamAttack()
+    if attackRemote then
+        pcall(function()
+            attackRemote:FireServer()
+        end)
+    end
+end
+
+-- Tìm kẻ địch gần
 local function getNearestEnemy()
-    local nearest = nil
-    local nearestDist = math.huge
+    local closest, shortestDist = nil, math.huge
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             local dist = (LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
-            if dist < nearestDist then
-                nearestDist = dist
-                nearest = player
+            if dist < shortestDist then
+                shortestDist = dist
+                closest = player
             end
         end
     end
-    return nearest, nearestDist
+    return closest, shortestDist
 end
 
--- Tấn công (spam)
-local function spamAttack()
-    local attackRemote = game:GetService("ReplicatedStorage"):FindFirstChild("Remotes"):FindFirstChild("Throw") -- tên remote có thể khác
-    if attackRemote then
-        attackRemote:FireServer()
-    end
-end
-
--- Vòng lặp chính
+-- Main
 RunService.Heartbeat:Connect(function()
-    pcall(autoParry) -- Luôn parry liên tục
+    autoParry()
 
     local enemy, dist = getNearestEnemy()
     if enemy and dist <= spamDistance then
         if tick() - lastSpam >= spamDelay then
-            pcall(spamAttack)
+            spamAttack()
             lastSpam = tick()
         end
     end
