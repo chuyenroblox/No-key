@@ -3665,7 +3665,7 @@ function CheckItemBPCRBPCR(v463)
     end
 end
 local v466 = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-NejiDepzai/UIRedzhub/refs/heads/main/UIRedz.lua"))():MakeWindow({
-    Title = "tokai hun",
+    Title = "tokai hub",
     SubTitle = "tokai tê liệt",
     SaveFolder = "BloxFruits.lua"
 })
